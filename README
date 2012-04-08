@@ -6,6 +6,7 @@ WPF版WpfPInvoke.slnで試しているところです。
 NuiImageStreamGetNextFrameでNUI_IMAGE_FRAMEのポインタを受け取り
 
 Marshal.PtrToStructureでNUI_IMAGE_FRAMEの実体へ変換がどうもうまくいっていない模様
+（メモリがずれてる？）
 
 
 その後
