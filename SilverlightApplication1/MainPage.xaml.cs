@@ -1,26 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Net;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
+using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using System.Windows.Media.Imaging;
 
 using System.Runtime.InteropServices;
 
 
-namespace WpfPInvoke
+namespace SilverlightApplication1
 {
-    /// <summary>
-    /// MainWindow.xaml の相互作用ロジック
-    /// </summary>
-    public partial class MainWindow : Window
+
+
+
+    public partial class MainPage : UserControl
     {
 
         #region DllImport
@@ -46,7 +45,7 @@ namespace WpfPInvoke
         [DllImport("Kinect10.DLL")]
         private static extern HRESULT NuiImageStreamGetNextFrame(IntPtr hStream,
            uint dwMillisecondsToWait, ref IntPtr ppcImageFrame);
-        //uint dwMillisecondsToWait, ref NUI_IMAGE_FRAME ppcImageFrame);
+           //uint dwMillisecondsToWait, ref NUI_IMAGE_FRAME ppcImageFrame);
 
         [DllImport("Kinect10.DLL")]
         private static extern HRESULT NuiImageStreamReleaseFrame(IntPtr hStream,
@@ -54,36 +53,38 @@ namespace WpfPInvoke
 
         #endregion
 
-        #region field
         private IntPtr streamHandle = IntPtr.Zero;
         private IntPtr imageFramePtr = IntPtr.Zero;
 
-        #endregion
-
-        public MainWindow()
+        public MainPage()
         {
             InitializeComponent();
         }
 
         #region ウインドウの表示と終了イベント
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
+
             HRESULT res = NuiInitialize((uint)NUI_INITIALIZE_FLAG.USES_COLOR);
             if (res != HRESULT.S_OK)
-                throw new InvalidOperationException("Failed to initialize the kinect:" + res.ToString());
+                throw new InvalidOperationException("Failed to initialize the kinect runtime, return value:" + res.ToString());
 
-            //
+
             OpenStream(NUI_IMAGE_TYPE.NUI_IMAGE_TYPE_COLOR, NUI_IMAGE_RESOLUTION.NUI_IMAGE_RESOLUTION_640x480);
 
 
+            //レンダリング時にKinectデータを取得し描画
             CompositionTarget.Rendering += compositionTarget_rendering;
+
         }
 
-        private void Window_Unloaded(object sender, RoutedEventArgs e)
+
+        private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
             NuiShutdown();
         }
+
 
         private void OpenStream(NUI_IMAGE_TYPE imageType, NUI_IMAGE_RESOLUTION resolution)
         {
@@ -98,7 +99,7 @@ namespace WpfPInvoke
 
 
         /// <summary>
-        /// Kinectデータを取得
+        /// レンダリング時にKinectデータを取得し描画
         /// </summary>
         private void compositionTarget_rendering(object sender, EventArgs e)
         {
@@ -154,9 +155,10 @@ namespace WpfPInvoke
                 }
             }
 
+
         }
 
 
-    }
 
+    }
 }
